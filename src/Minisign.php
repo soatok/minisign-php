@@ -13,7 +13,7 @@ class Minisign
     const ALG_HASHEDDSA = 'ED';
     const ALG_SCRYPT = 'Sc';
     const ALG_BLAKE2 = 'B2';
-    const REGEX = '#^' . Minisign::COMMENT_PREFIX . '(.+?)[\s]+\n([A-Za-z0-9+/=]+)[\s]+?$#';
+    const REGEX = '#^' . Minisign::COMMENT_PREFIX . '(.+?)[\r\n\s]+([A-Za-z0-9+/=]+)[\s]+?$#';
     const COMMENT_PREFIX = 'untrusted comment: ';
     const TRUSTED_COMMENT_PREFIX = 'trusted comment: ';
 

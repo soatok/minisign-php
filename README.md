@@ -66,19 +66,57 @@ The public key can either reside in a file (`./minisign.pub` by default) or be d
 
 ```php
 <?php
-use Soatok\Minisign\Minisign;
+use Soatok\Minisign\Core\SecretKey;
+
+$secretKey = SecretKey::generate();
+$password = 'correct horse battery staple';
+$saveToFile = $secretKey->serialize($password);
+\file_put_contents('/path/to/secret.key', $saveToFile);
 ```
 
 ### Signing a file
 
 ```php
 <?php
-use Soatok\Minisign\Minisign;
+use Soatok\Minisign\Core\SecretKey;
+use Soatok\Minisign\Core\File\MessageFile;
+
+$trustedComment = 'Trusted comment goes here';
+$untrustedComment = 'Untrusted comment; can be changed';
+$password = 'correct horse battery staple';
+$preHash = false; // Set to TRUE to prehash the file
+
+$secretKey = SecretKey::fromFile('/path/to/secret.key', $password);
+$fileToSign = MessageFile::fromFile('/path/to/file');
+$signature = $fileToSign->sign(
+    $secretKey,
+    $preHash,
+    $trustedComment,
+    $untrustedComment
+);
+
+\file_put_contents(
+    '/path/to/file.minisig',
+    $signature->toSigFile()->getContents()
+);
 ```
 
 ### Verifying a file
 
 ```php
 <?php
-use Soatok\Minisign\Minisign;
+use Soatok\Minisign\Core\PublicKey;
+use Soatok\Minisign\Core\File\{
+    MessageFile,
+    SigFile
+};
+
+$pk = PublicKey::fromFile('/path/to/minisign.pub');
+$fileToCheck = MessageFile::fromFile('/path/to/file');
+$signature = SigFile::fromFile('/path/to/file.minisig')->deserialize();
+if (!$fileToCheck->verify($pk, $signature)) {
+    echo 'Invalid signature!', PHP_EOL;
+    exit(1);
+}
+$trusted = $signature->getTrustedComment();
 ```

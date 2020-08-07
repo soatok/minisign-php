@@ -1,0 +1,32 @@
+<?php
+declare(strict_types=1);
+namespace Soatok\Minisign;
+
+/**
+ * Class Minisign
+ * @package Soatok\Minisign
+ */
+class Minisign
+{
+    const VERSION = 'v0.1';
+    const ALG_EDDSA = 'Ed';
+    const ALG_HASHEDDSA = 'ED';
+    const ALG_SCRYPT = 'Sc';
+    const ALG_BLAKE2 = 'B2';
+    const REGEX = '#^' . Minisign::COMMENT_PREFIX . '(.+?)[\s]+\n([A-Za-z0-9+/=]+)[\s]+?$#';
+    const COMMENT_PREFIX = 'untrusted comment: ';
+    const TRUSTED_COMMENT_PREFIX = 'trusted comment: ';
+
+    /**
+     * @return string
+     */
+    public static function getHomeDir(): string
+    {
+        if (DIRECTORY_SEPARATOR === '\\') {
+            // Windows-specific:
+            return (string) $_SERVER['HOMEDRIVE'] . (string) $_SERVER['HOMEPATH'];
+        }
+        // Linux and Mac:
+        return (string) $_SERVER['HOME'];
+    }
+}

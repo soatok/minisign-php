@@ -1,0 +1,60 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+use GetOpt\{
+    GetOpt,
+    Option
+};
+use Soatok\Minisign\Commands\{
+    Generate,
+    Sign,
+    Verify
+};
+use Soatok\Minisign\Minisign;
+
+if (!is_readable(dirname(__DIR__) . '/vendor/autoload.php')) {
+    echo 'You must use Composer to install dependencies first!', PHP_EOL;
+    exit(255);
+}
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+$getOpt = (new GetOpt())
+    ->addOption(Option::create('G', null)) // Mandatory: one of these
+    ->addOption(Option::create('V', null)) // Mandatory: one of these
+    ->addOption(Option::create('S', null)) // Mandatory: one of these
+    ->addOption(Option::create('f', null))
+    ->addOption(Option::create('H', null))
+    ->addOption(Option::create('o', null))
+    ->addOption(Option::create('q', null))
+    ->addOption(Option::create('Q', null))
+    ->addOption(Option::create('c', null, GetOpt::OPTIONAL_ARGUMENT))
+    ->addOption(Option::create('m', null, GetOpt::OPTIONAL_ARGUMENT))
+    ->addOption(Option::create('x', null, GetOpt::OPTIONAL_ARGUMENT))
+    ->addOption(Option::create('P', null, GetOpt::OPTIONAL_ARGUMENT))
+    ->addOption(Option::create('p', null, GetOpt::OPTIONAL_ARGUMENT))
+    ->addOption(Option::create('s', null, GetOpt::OPTIONAL_ARGUMENT))
+    ->addOption(Option::create('t', null, GetOpt::OPTIONAL_ARGUMENT));
+
+$getOpt->process();
+$options = $getOpt->getOptions();
+
+try {
+    if (isset($options['G'])) {
+        $command = new Generate($options);
+    } elseif (isset($options['S'])) {
+        $command = new Sign($options);
+    } elseif (isset($options['V'])) {
+        $command = new Verify($options);
+    } elseif (isset($options['v'])) {
+        echo Minisign::VERSION, PHP_EOL;
+    } else {
+        echo file_get_contents(__DIR__ . '/usage.txt');
+        exit(0);
+    }
+    $command();
+} catch (\Throwable $ex) {
+    echo $ex->getMessage(), PHP_EOL;
+    echo $ex->getTraceAsString(), PHP_EOL;
+    exit(255);
+}

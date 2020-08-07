@@ -54,7 +54,7 @@ class SecretKey
     public static function deserialize(string $contents, string $password): self
     {
         if (!\preg_match(Minisign::REGEX, $contents, $m)) {
-            throw new MinisignException('Invalid public key format');
+            throw new MinisignException('Invalid secret key format');
         }
         $untrusted = $m[1];
         $decoded = Base64::decode($m[2]);

@@ -22,6 +22,7 @@
   },
   "bin": ["bin/minisign"],
   "require": {
+    "ext-sodium": "*",
     "php": "^7.2|^8",
     "ulrichsg/getopt-php": "^3",
     "paragonie/constant_time_encoding": "^2",

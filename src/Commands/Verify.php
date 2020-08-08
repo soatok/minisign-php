@@ -48,7 +48,9 @@ class Verify implements CommandInterface
         if (empty($options['m'])) {
             throw new MinisignException('Error: file not specified');
         }
-        $this->file = \realpath((string) $options['m'][0]);
+        /** @var array<array-key, string> $files */
+        $files = $options['m'];
+        $this->file = \realpath((string) $files[0]);
         if (!empty($options['x'])) {
             $this->sigFile = (string) $options['x'];
         } else {

@@ -2,10 +2,10 @@
 
 [![Support on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fsoatok&style=flat)](https://patreon.com/soatok)
 [![Linux Build Status](https://travis-ci.org/soatok/minisign-php.svg?branch=master)](https://travis-ci.org/soatok/minisign-php)
-[![Latest Stable Version](https://poser.pugx.org/soatok/minisign/v/stable)](https://packagist.org/packages/soatok/minisign-php)
-[![Latest Unstable Version](https://poser.pugx.org/soatok/minisign/v/unstable)](https://packagist.org/packages/soatok/minisign-php)
-[![License](https://poser.pugx.org/soatok/minisign/license)](https://packagist.org/packages/soatok/minisign-php)
-[![Downloads](https://img.shields.io/packagist/dt/soatok/minisign.svg)](https://packagist.org/packages/soatok/minisign-php)
+[![Latest Stable Version](https://poser.pugx.org/soatok/minisign/v/stable)](https://packagist.org/packages/soatok/minisign)
+[![Latest Unstable Version](https://poser.pugx.org/soatok/minisign/v/unstable)](https://packagist.org/packages/soatok/minisign)
+[![License](https://poser.pugx.org/soatok/minisign/license)](https://packagist.org/packages/soatok/minisign)
+[![Downloads](https://img.shields.io/packagist/dt/soatok/minisign.svg)](https://packagist.org/packages/soatok/minisign)
 
 PHP implementation of [Minisign](https://jedisct1.github.io/minisign/).
 Powered by Libsodium.

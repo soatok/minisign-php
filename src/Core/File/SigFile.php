@@ -17,7 +17,7 @@ use Soatok\Minisign\Minisign;
  */
 class SigFile extends FileStream
 {
-    const LINE1_REGEX = '#^' . Minisign::COMMENT_PREFIX . '(.+?)$#';
+    const LINE1_REGEX = '#^' . Minisign::COMMENT_PREFIX . '(.*)$#';
     const BASE64_REGEX = '#^([A-Za-z0-9+/=]+)$#';
     const LINE3_REGEX = '#^' . Minisign::TRUSTED_COMMENT_PREFIX . '(.+?)$#';
 
@@ -84,7 +84,7 @@ class SigFile extends FileStream
         }
         $trusted = $m[1];
         if (!\preg_match(self::BASE64_REGEX, $contents[3], $m)) {
-            throw new MinisignException('Error deserializing signature file on line 2');
+            throw new MinisignException('Error deserializing signature file on line 4');
         }
         $globalSignature = Base64::decode($m[1]);
         return new Signature($signature, $keyId, $globalSignature, $alg, $trusted, $untrusted);

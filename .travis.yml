@@ -13,6 +13,8 @@ matrix:
 install:
   - composer self-update
   - composer update
+  - chmod +x bin/test-cli.sh
 
 script:
   - composer test
+  - bin/test-cli.sh

@@ -20,8 +20,8 @@ class Sign implements CommandInterface
     /** @var string $secretKeyFile */
     private $secretKeyFile;
 
-    /** @var string $file */
-    private $file;
+    /** @var string[] $file */
+    private $files = [];
 
     /** @var string $sigFile */
     private $sigFile;
@@ -45,12 +45,16 @@ class Sign implements CommandInterface
         if (empty($options['m'])) {
             throw new MinisignException('Error: file not specified');
         }
-        $this->file = \realpath((string) $options['m']);
+        /** @var array<array-key, string> $selectedFiles */
+        $selectedFiles = $options['m'];
+        foreach ($selectedFiles as $file) {
+            $this->files []= \realpath((string) $file);
+        }
 
-        if (!empty($options['x'])) {
+        if (!empty($options['x']) && count($this->files) === 1) {
             $this->sigFile = (string) $options['x'];
         } else {
-            $this->sigFile = $this->file . '.minisig';
+            $this->sigFile = '';
         }
 
         if (!empty($options['s'])) {
@@ -76,13 +80,22 @@ class Sign implements CommandInterface
      */
     public function __invoke()
     {
-        $message = MessageFile::fromFile($this->file);
         $password = $this->silentPrompt();
         $sk = SecretKey::fromFile($this->secretKeyFile, $password);
-        $sig = $message->sign($sk, $this->preHash, $this->trustedComment, $this->untrustedComment);
-        \file_put_contents(
-            $this->sigFile,
-            $sig->toSigFile()->getContents()
-        );
+        foreach ($this->files as $file) {
+            $message = MessageFile::fromFile($file);
+            $sig = $message->sign($sk, $this->preHash, $this->trustedComment, $this->untrustedComment);
+            if (!empty($this->sigFile)) {
+                \file_put_contents(
+                    $this->sigFile,
+                    $sig->toSigFile()->getContents()
+                );
+            } else {
+                \file_put_contents(
+                    $file . '.minisig',
+                    $sig->toSigFile()->getContents()
+                );
+            }
+        }
     }
 }

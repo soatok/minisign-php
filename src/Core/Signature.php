@@ -69,7 +69,7 @@ class Signature
      */
     public function getKeyId(): string
     {
-        return $this->getKeyId();
+        return $this->keyId;
     }
 
     /**

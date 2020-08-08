@@ -71,6 +71,7 @@ class FileStream
         if (!\is_resource($resource)) {
             throw new \TypeError('Argument 1 must be a resource, ' . \gettype($resource) . ' given.');
         }
+        \fseek($resource, 0);
         $fp = \fopen('php://temp', 'wb');
         $result = \stream_copy_to_stream($resource, $fp);
         if (!\is_int($result)) {
@@ -103,7 +104,7 @@ class FileStream
      */
     public function getContents(): string
     {
-        \fseek($this->fp, 0);
+        \fseek($this->fp, 0, SEEK_SET);
         return (string) \stream_get_contents($this->fp);
     }
 

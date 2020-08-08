@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Soatok\Minisign\Commands;
 
+use ParagonIE\ConstantTime\Base64;
 use Soatok\Minisign\CommandInterface;
 use Soatok\Minisign\Core\File\MessageFile;
 use Soatok\Minisign\Core\File\SigFile;
@@ -47,7 +48,7 @@ class Verify implements CommandInterface
         if (empty($options['m'])) {
             throw new MinisignException('Error: file not specified');
         }
-        $this->file = \realpath((string) $options['m']);
+        $this->file = \realpath((string) $options['m'][0]);
         if (!empty($options['x'])) {
             $this->sigFile = (string) $options['x'];
         } else {

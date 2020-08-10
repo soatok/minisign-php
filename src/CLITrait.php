@@ -36,6 +36,7 @@ trait CLITrait
      * @return string
      *
      * @psalm-suppress ForbiddenCode { THIS IS FINE }
+     * @throws MinisignException
      */
     public function silentPrompt(string $text = 'Enter Password:'): string
     {
@@ -47,10 +48,14 @@ trait CLITrait
             );
             $command = "cscript //nologo " . \escapeshellarg($vbscript);
             $password = \rtrim(
-                (string) \shell_exec($command)
+                (string)\shell_exec($command)
             );
             \unlink($vbscript);
+        } elseif (defined('STDIN')) {
+            echo $text;
+            return $this->silentPromptStdin();
         } else {
+            // @todo warn on this branch? remove branch?
             $command = "/usr/bin/env bash -c 'echo OK'";
             if (\rtrim((string) \shell_exec($command)) !== 'OK') {
                 throw new MinisignException("Can't invoke bash");
@@ -60,5 +65,21 @@ trait CLITrait
             echo "\n";
         }
         return $password;
+    }
+
+    /**
+     * @return string
+     * @throws MinisignException
+     * @psalm-suppress ForbiddenCode { THIS IS FINE }
+     */
+    public function silentPromptStdin(): string
+    {
+        if (!defined('STDIN')) {
+            throw new MinisignException('STDIN is not available');
+        }
+        \exec('stty -echo');
+        $result = \fgets(STDIN);
+        \exec('stty echo');
+        return $result;
     }
 }

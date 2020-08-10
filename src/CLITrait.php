@@ -54,6 +54,8 @@ trait CLITrait
             echo $text, ' ';
             $password = $this->silentPromptStdin();
             echo PHP_EOL;
+        } else {
+            throw new MinisignException('STDIN not defined');
         }
         return $password;
     }

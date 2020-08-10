@@ -24,7 +24,6 @@ trait CLITrait
         return Binary::safeSubstr(\fgets($fp), 0, -1);
     }
 
-
     /**
      * Interactively prompts for input without echoing to the terminal.
      * Requires a bash shell or Windows and won't work with
@@ -52,17 +51,9 @@ trait CLITrait
             );
             \unlink($vbscript);
         } elseif (defined('STDIN')) {
-            echo $text;
-            return $this->silentPromptStdin();
-        } else {
-            // @todo warn on this branch? remove branch?
-            $command = "/usr/bin/env bash -c 'echo OK'";
-            if (\rtrim((string) \shell_exec($command)) !== 'OK') {
-                throw new MinisignException("Can't invoke bash");
-            }
-            $command = "/usr/bin/env bash -c 'read -s -p \"" . \addslashes($text) . "\" mypassword && echo \$mypassword'";
-            $password = \rtrim((string) \shell_exec($command));
-            echo "\n";
+            echo $text, ' ';
+            $password = $this->silentPromptStdin();
+            echo PHP_EOL;
         }
         return $password;
     }

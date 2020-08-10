@@ -40,16 +40,7 @@ trait CLITrait
     public function silentPrompt(string $text = 'Enter Password:'): string
     {
         if (DIRECTORY_SEPARATOR === '\\') {
-            $vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
-            \file_put_contents(
-                $vbscript,
-                'wscript.echo(InputBox("' . \addslashes($text) . '", "", "password here"))'
-            );
-            $command = "cscript //nologo " . \escapeshellarg($vbscript);
-            $password = \rtrim(
-                (string)\shell_exec($command)
-            );
-            \unlink($vbscript);
+            $password = $this->silentPromptWindows($text);
         } elseif (defined('STDIN')) {
             echo $text, ' ';
             $password = $this->silentPromptStdin();
@@ -61,11 +52,31 @@ trait CLITrait
     }
 
     /**
+     * @param string $text
+     * @return string
+     * @psalm-suppress ForbiddenCode { THIS IS FINE }
+     */
+    protected function silentPromptWindows(string $text): string
+    {
+        $vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
+        \file_put_contents(
+            $vbscript,
+            'wscript.echo(InputBox("' . \addslashes($text) . '", "", "password here"))'
+        );
+        $command = "cscript //nologo " . \escapeshellarg($vbscript);
+        $password = \rtrim(
+            (string) \shell_exec($command)
+        );
+        \unlink($vbscript);
+        return $password;
+    }
+
+    /**
      * @return string
      * @throws MinisignException
      * @psalm-suppress ForbiddenCode { THIS IS FINE }
      */
-    public function silentPromptStdin(): string
+    protected function silentPromptStdin(): string
     {
         if (!defined('STDIN')) {
             throw new MinisignException('STDIN is not available');

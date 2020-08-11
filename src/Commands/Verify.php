@@ -8,6 +8,7 @@ use Soatok\Minisign\Core\File\MessageFile;
 use Soatok\Minisign\Core\File\SigFile;
 use Soatok\Minisign\Core\PublicKey;
 use Soatok\Minisign\Exceptions\MinisignException;
+use Soatok\Minisign\Exceptions\MinisignFileException;
 
 /**
  * Class Verify
@@ -50,7 +51,13 @@ class Verify implements CommandInterface
         }
         /** @var array<array-key, string> $files */
         $files = $options['m'];
-        $this->file = \realpath((string) $files[0]);
+        $file = (string) $files[0];
+        $realpath = \realpath($file);
+        if (empty($realpath)) {
+            throw new MinisignFileException('File not found: ' . $file);
+        }
+        $this->file = $realpath;
+
         if (!empty($options['x'])) {
             $this->sigFile = (string) $options['x'];
         } else {
@@ -65,6 +72,30 @@ class Verify implements CommandInterface
         } else {
             $this->quiet = 0;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile(): string
+    {
+        return $this->file;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSignatureFile(): string
+    {
+        return $this->sigFile;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQuietLevel(): int
+    {
+        return $this->quiet;
     }
 
     /**

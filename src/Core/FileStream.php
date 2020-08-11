@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Soatok\Minisign\Core;
 
-use Soatok\Minisign\Exceptions\MinisignException;
+use Soatok\Minisign\Exceptions\MinisignFileException;
 
 /**
  * Class FileStream
@@ -28,7 +28,7 @@ class FileStream
     /**
      * FileStream constructor.
      * @param resource $fp
-     * @throws MinisignException
+     * @throws MinisignFileException
      * @throws \TypeError
      */
     public function __construct($fp)
@@ -39,12 +39,12 @@ class FileStream
         $this->fp = $fp;
         $pos = \ftell($this->fp);
         if (!\is_int($pos)) {
-            throw new MinisignException('Could not get current stream position');
+            throw new MinisignFileException('Could not get current stream position');
         }
         $this->pos = $pos;
         $stat = \fstat($this->fp);
         if (!\is_array($stat)) {
-            throw new MinisignException('fstat() returned invalid data');
+            throw new MinisignFileException('fstat() returned invalid data');
         }
         $this->stat = $stat;
     }
@@ -63,7 +63,7 @@ class FileStream
      *
      * @param resource $resource
      * @return static
-     * @throws MinisignException
+     * @throws MinisignFileException
      * @throws \TypeError
      */
     public static function fromStream($resource): self
@@ -75,7 +75,7 @@ class FileStream
         $fp = \fopen('php://temp', 'wb');
         $result = \stream_copy_to_stream($resource, $fp);
         if (!\is_int($result)) {
-            throw new MinisignException('Could not copy stream to temporary buffer');
+            throw new MinisignFileException('Could not copy stream to temporary buffer');
         }
         return new static($fp);
     }
@@ -83,13 +83,13 @@ class FileStream
     /**
      * @param string $path
      * @return static
-     * @throws MinisignException
+     * @throws MinisignFileException
      */
     public static function fromFile(string $path): self
     {
         $fp = \fopen(\realpath($path), 'rb');
         if (!\is_resource($fp)) {
-            throw new MinisignException('Could not open file for reading');
+            throw new MinisignFileException('Could not open file for reading');
         }
         try {
             return self::fromStream($fp);

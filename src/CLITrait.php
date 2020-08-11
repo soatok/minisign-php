@@ -3,7 +3,10 @@ declare(strict_types=1);
 namespace Soatok\Minisign;
 
 use ParagonIE\ConstantTime\Binary;
-use Soatok\Minisign\Exceptions\MinisignException;
+use Soatok\Minisign\Exceptions\{
+    MinisignException,
+    MinisignFileException
+};
 
 /**
  * Trait CLITrait
@@ -34,7 +37,6 @@ trait CLITrait
      * @param string $text
      * @return string
      *
-     * @psalm-suppress ForbiddenCode { THIS IS FINE }
      * @throws MinisignException
      */
     public function silentPrompt(string $text = 'Enter Password:'): string
@@ -75,13 +77,13 @@ trait CLITrait
      * Read input from STDIN without echoing it to the shell.
      *
      * @return string
-     * @throws MinisignException
+     * @throws MinisignFileException
      * @psalm-suppress ForbiddenCode { THIS IS FINE }
      */
     protected function silentPromptStdin(): string
     {
         if (!defined('STDIN')) {
-            throw new MinisignException('STDIN is not available');
+            throw new MinisignFileException('STDIN is not available');
         }
         \exec('stty -echo');
         $result = \fgets(STDIN);

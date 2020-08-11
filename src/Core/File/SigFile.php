@@ -8,7 +8,7 @@ use Soatok\Minisign\Core\{
 };
 use ParagonIE\ConstantTime\Base64;
 use ParagonIE\ConstantTime\Binary;
-use Soatok\Minisign\Exceptions\MinisignException;
+use Soatok\Minisign\Exceptions\MinisignFileException;
 use Soatok\Minisign\Minisign;
 
 /**
@@ -37,7 +37,7 @@ class SigFile extends FileStream
      *
      * @param Signature $sig
      * @return static
-     * @throws MinisignException
+     * @throws MinisignFileException
      */
     public static function serialize(Signature $sig): self
     {
@@ -57,22 +57,22 @@ class SigFile extends FileStream
      * Deserializes the current stream into a Signature object.
      *
      * @return Signature
-     * @throws MinisignException
+     * @throws MinisignFileException
      */
     public function deserialize(): Signature
     {
         /** @var array<array-key, string> $contents */
         $contents = \preg_split('/[\r\n]+/', $this->getContents());
         if (count($contents) < 4) {
-            throw new MinisignException('Error deserializing signature file: Insufficient line count');
+            throw new MinisignFileException('Error deserializing signature file: Insufficient line count');
         }
         if (!\preg_match(self::LINE1_REGEX, $contents[0], $m)) {
-            throw new MinisignException('Error deserializing signature file on line 1');
+            throw new MinisignFileException('Error deserializing signature file on line 1');
         }
         $untrusted = $m[1];
 
         if (!\preg_match(self::BASE64_REGEX, $contents[1], $m)) {
-            throw new MinisignException('Error deserializing signature file on line 2');
+            throw new MinisignFileException('Error deserializing signature file on line 2');
         }
         $decoded = Base64::decode($m[1]);
         $alg = Binary::safeSubstr($decoded, 0, 2);
@@ -80,11 +80,11 @@ class SigFile extends FileStream
         $signature = Binary::safeSubstr($decoded, 10);
 
         if (!\preg_match(self::LINE3_REGEX, $contents[2], $m)) {
-            throw new MinisignException('Error deserializing signature file on line 3');
+            throw new MinisignFileException('Error deserializing signature file on line 3');
         }
         $trusted = $m[1];
         if (!\preg_match(self::BASE64_REGEX, $contents[3], $m)) {
-            throw new MinisignException('Error deserializing signature file on line 4');
+            throw new MinisignFileException('Error deserializing signature file on line 4');
         }
         $globalSignature = Base64::decode($m[1]);
         return new Signature($signature, $keyId, $globalSignature, $alg, $trusted, $untrusted);

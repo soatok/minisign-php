@@ -2,9 +2,15 @@
 declare(strict_types=1);
 namespace Soatok\Minisign\Core;
 
-use ParagonIE\ConstantTime\Base64;
-use ParagonIE\ConstantTime\Binary;
-use Soatok\Minisign\Exceptions\MinisignException;
+use ParagonIE\ConstantTime\{
+    Base64,
+    Binary
+};
+use Soatok\Minisign\Exceptions\{
+    MinisignCryptoException,
+    MinisignException,
+    MinisignFileException
+};
 use Soatok\Minisign\Minisign;
 
 /**
@@ -54,7 +60,7 @@ class SecretKey
     public static function deserialize(string $contents, string $password): self
     {
         if (!\preg_match(Minisign::REGEX, $contents, $m)) {
-            throw new MinisignException('Invalid secret key format');
+            throw new MinisignFileException('Invalid secret key format');
         }
         $untrusted = $m[1];
         $decoded = Base64::decode($m[2]);
@@ -79,7 +85,7 @@ class SecretKey
             $sigAlg . $keyId . $ed25519sk . $ed25519pk
         );
         if (!\hash_equals($calcCsum, $checksum)) {
-            throw new MinisignException('Checksum failed');
+            throw new MinisignCryptoException('Checksum failed');
         }
 
         $self = new static();
@@ -110,11 +116,11 @@ class SecretKey
             $filePath = Minisign::getHomeDir() . '/.minisign/minisign.key';
         }
         if (!\is_readable($filePath)) {
-            throw new MinisignException('File is not readable: ' . $filePath);
+            throw new MinisignFileException('File is not readable: ' . $filePath);
         }
         $contents = \file_get_contents($filePath);
         if (!\is_string($contents)) {
-            throw new MinisignException('File could not be read: ' . $filePath);
+            throw new MinisignFileException('File could not be read: ' . $filePath);
         }
         return self::deserialize($contents, $password);
     }
@@ -148,13 +154,13 @@ class SecretKey
      * @param int $ops
      * @param int $mem
      * @return string
-     * @throws MinisignException
+     * @throws MinisignCryptoException
      * @throws \SodiumException
      */
     protected static function kdf(string $alg, string $pw, string $salt, int $ops, int $mem): string
     {
         if ($alg !== Minisign::ALG_SCRYPT) {
-            throw new MinisignException('Invalid KDF algorithm');
+            throw new MinisignCryptoException('Invalid KDF algorithm');
         }
         return \sodium_crypto_pwhash_scryptsalsa208sha256(104, $pw, $salt, $ops, $mem);
     }
@@ -214,11 +220,7 @@ class SecretKey
         $toEncode .= \pack('V', $this->kdfOpsLimit) . "\0\0\0\0";
         $toEncode .= \pack('V', $this->kdfMemLimit) . "\0\0\0\0";
         $kdfOutput = self::kdf($this->kdfAlgorithm, $password, $kdfSalt, $this->kdfOpsLimit, $this->kdfMemLimit);
-        try {
-            \sodium_memzero($password);
-        } catch (\SodiumException $ex) {
-            $password ^= $password;
-        }
+        \sodium_memzero($password);
         $checksum = \sodium_crypto_generichash(
             $this->signatureAlgorithm . $this->keyId . $this->ed25519sk
         );

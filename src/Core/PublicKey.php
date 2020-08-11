@@ -2,9 +2,15 @@
 declare(strict_types=1);
 namespace Soatok\Minisign\Core;
 
-use ParagonIE\ConstantTime\Base64;
-use ParagonIE\ConstantTime\Binary;
-use Soatok\Minisign\Exceptions\MinisignException;
+use ParagonIE\ConstantTime\{
+    Base64,
+    Binary
+};
+use Soatok\Minisign\Exceptions\{
+    MinisignCryptoException,
+    MinisignException,
+    MinisignFileException
+};
 use Soatok\Minisign\Minisign;
 
 /**
@@ -36,7 +42,7 @@ class PublicKey
     {
         $len = Binary::safeStrlen($pk);
         if ($len !== SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES) {
-            throw new MinisignException(
+            throw new MinisignCryptoException(
                 'Public key must be ' . SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES . ' bytes, got ' . $len . ' bytes.'
             );
         }
@@ -70,11 +76,11 @@ class PublicKey
     public static function fromFile(string $path): self
     {
         if (!\is_readable($path)) {
-            throw new MinisignException('Cannot read file: ' . \realpath($path));
+            throw new MinisignFileException('Cannot read file: ' . \realpath($path));
         }
         $contents = \file_get_contents($path);
         if (!\is_string($contents)) {
-            throw new MinisignException('Could not read file: '. \realpath($path));
+            throw new MinisignFileException('Could not read file: '. \realpath($path));
         }
         return self::deserialize($contents);
     }

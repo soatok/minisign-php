@@ -2,8 +2,6 @@
 declare(strict_types=1);
 namespace Soatok\Minisign;
 
-use Soatok\Minisign\Exceptions\MinisignException;
-
 /**
  * Class CommandInterface
  * @package Soatok\Minisign

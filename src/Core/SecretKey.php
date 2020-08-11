@@ -34,17 +34,17 @@ class SecretKey
     /** @var string $ed25519sk */
     private $ed25519sk = '';
 
+    /**
+     * Deserialize on destruct.
+     */
     public function __destruct()
     {
-        try {
-            \sodium_memzero($this->ed25519sk);
-        } catch (\SodiumException $ex) {
-            // Best effort.
-            $this->ed25519sk ^= $this->ed25519sk;
-        }
+        \sodium_memzero($this->ed25519sk);
     }
 
     /**
+     * Deserialize a minisign secret key from the keyfile contents and password.
+     *
      * @param string $contents
      * @param string $password
      * @return static
@@ -67,11 +67,7 @@ class SecretKey
         $kdfOpsLimit = (int) \unpack('V', $packedOpsLimit)[1];
         $kdfMemLimit = (int) \unpack('V', $packedMemLimit)[1];
         $kdfOutput = self::kdf($kdfAlg, $password, $kdfSalt, $kdfOpsLimit, $kdfMemLimit);
-        try {
-            \sodium_memzero($password);
-        } catch (\SodiumException $ex) {
-            $password ^= $password;
-        }
+        \sodium_memzero($password);
         $remainder = (string) (Binary::safeSubstr($decoded, 54, 104) ^ $kdfOutput);
         $keyId = Binary::safeSubstr($remainder, 0, 8);
         $ed25519sk = Binary::safeSubstr($remainder, 8, 32);
@@ -100,10 +96,13 @@ class SecretKey
     }
 
     /**
+     * Deserialize a minisign secret key from the key file and password.
+     *
      * @param string $filePath
      * @param string $password
      * @return static
      * @throws MinisignException
+     * @throws \SodiumException
      */
     public static function fromFile(string $filePath, string $password): self
     {
@@ -121,6 +120,8 @@ class SecretKey
     }
 
     /**
+     * Generate a new Minsign secret key.
+     *
      * @return static
      * @throws \SodiumException
      */
@@ -139,6 +140,8 @@ class SecretKey
     }
 
     /**
+     * Perform the KDF algorithm.
+     *
      * @param string $alg
      * @param string $pw
      * @param string $salt
@@ -193,6 +196,8 @@ class SecretKey
     }
 
     /**
+     * Serialize this secret key for file storage.
+     *
      * @param string $password
      * @return string
      * @throws \SodiumException
@@ -223,72 +228,98 @@ class SecretKey
     }
 
     /**
+     * Return a copy of this object with a different checksum algorithm.
+     *
      * @param string $alg
      * @return self
      */
     public function withChecksumAlgorithm(string $alg): self
     {
-        $this->checksumAlgorithm = $alg;
-        return $this;
+        $self = clone $this;
+        $self->checksumAlgorithm = $alg;
+        return $self;
     }
 
     /**
+     * Return a copy of this object with a different KDF algorithm.
+     *
      * @param string $alg
      * @return self
      */
     public function withKdfAlgorithm(string $alg): self
     {
-        $this->kdfAlgorithm = $alg;
-        return $this;
+        $self = clone $this;
+        $self->kdfAlgorithm = $alg;
+        return $self;
     }
 
     /**
+     * Return a copy of this object with a limited KDF memory.
+     *
      * @param int $memLimit
      * @return self
      */
     public function withKdfMemLimit(int $memLimit): self
     {
-        $this->kdfMemLimit = $memLimit;
-        return $this;
+        $self = clone $this;
+        $self->kdfMemLimit = $memLimit;
+        return $self;
     }
 
     /**
+     * Return a copy of this object with a limited number of KDF ops.
+     *
      * @param int $opsLimit
      * @return self
      */
     public function withKdfOpsLimit(int $opsLimit): self
     {
-        $this->kdfOpsLimit = $opsLimit;
-        return $this;
+        $self = clone $this;
+        $self->kdfOpsLimit = $opsLimit;
+        return $self;
     }
 
     /**
+     * Return a copy of this object with the provided key ID.
+     *
      * @param string $keyId
      * @return self
+     * @throws MinisignException
      */
     public function withKeyId(string $keyId): self
     {
-        $this->keyId = $keyId;
-        return $this;
+        if (Binary::safeStrlen($keyId) !== 8) {
+            throw new MinisignException('Invalid Key ID; must be 8 bytes.');
+        }
+        $self = clone $this;
+        $self->keyId = $keyId;
+        return $self;
     }
 
     /**
+     * Return a copy of this object with a different signature algorithm.
+     *
      * @param string $alg
      * @return self
      */
     public function withSignatureAlgorithm(string $alg): self
     {
-        $this->signatureAlgorithm = $alg;
-        return $this;
+        $self = clone $this;
+        $self->signatureAlgorithm = $alg;
+        return $self;
     }
 
     /**
+     * Return a copy of this object with the untrusted comment for when this key is serialized
+     * set to whatever the user provided.
+     *
      * @param string $comment
      * @return self
      */
     public function withUntrustedComment(string $comment): self
     {
-        $this->untrustedComment = $comment;
-        return $this;
+        $self = clone $this;
+        $self->untrustedComment = $comment;
+        return $self;
     }
 }

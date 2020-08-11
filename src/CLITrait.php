@@ -52,26 +52,28 @@ trait CLITrait
     }
 
     /**
+     * Prompt the user with a popup to provide the requested information.
+     *
      * @param string $text
      * @return string
      * @psalm-suppress ForbiddenCode { THIS IS FINE }
      */
     protected function silentPromptWindows(string $text): string
     {
-        $vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
+        $vbscript = \sys_get_temp_dir() . 'prompt_password.vbs';
         \file_put_contents(
             $vbscript,
             'wscript.echo(InputBox("' . \addslashes($text) . '", "", "password here"))'
         );
         $command = "cscript //nologo " . \escapeshellarg($vbscript);
-        $password = \rtrim(
-            (string) \shell_exec($command)
-        );
+        $password = \rtrim((string) \shell_exec($command));
         \unlink($vbscript);
         return $password;
     }
 
     /**
+     * Read input from STDIN without echoing it to the shell.
+     *
      * @return string
      * @throws MinisignException
      * @psalm-suppress ForbiddenCode { THIS IS FINE }

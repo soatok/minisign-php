@@ -18,6 +18,8 @@ class Minisign
     const TRUSTED_COMMENT_PREFIX = 'trusted comment: ';
 
     /**
+     * Get the homedir of the current active user.
+     *
      * @return string
      */
     public static function getHomeDir(): string

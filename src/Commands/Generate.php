@@ -35,8 +35,11 @@ class Generate implements CommandInterface
      */
     public function __invoke()
     {
+        if (!\is_dir(Minisign::getHomeDir() . '/.minisign')) {
+            \mkdir(Minisign::getHomeDir() . '/.minisign', 0700);
+        }
         $path = Minisign::getHomeDir() . '/.minisign/minisign.key';
-        if (file_exists($path) && !$this->force) {
+        if (\file_exists($path) && !$this->force) {
             echo 'File already exists. Use -f to force generate.', PHP_EOL;
             exit(1);
         }

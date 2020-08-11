@@ -17,6 +17,8 @@ use Soatok\Minisign\Minisign;
 class MessageFile extends FileStream
 {
     /**
+     * Sign this file with a secret key.
+     *
      * @param SecretKey $sk
      * @param bool $preHash
      * @param string $trustedComment
@@ -47,6 +49,8 @@ class MessageFile extends FileStream
     }
 
     /**
+     * Verify this file has a valid minisign signature for the given public key.
+     *
      * @param PublicKey $pk
      * @param Signature $sig
      * @return bool

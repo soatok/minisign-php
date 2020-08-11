@@ -6,6 +6,7 @@ use Soatok\Minisign\CLITrait;
 use Soatok\Minisign\CommandInterface;
 use Soatok\Minisign\Core\File\MessageFile;
 use Soatok\Minisign\Core\SecretKey;
+use Soatok\Minisign\Core\Signature;
 use Soatok\Minisign\Exceptions\MinisignException;
 use Soatok\Minisign\Minisign;
 
@@ -80,22 +81,41 @@ class Sign implements CommandInterface
      */
     public function __invoke()
     {
+        if (\file_exists($this->secretKeyFile)) {
+            throw new MinisignException('Secret key file not found: ' . $this->secretKeyFile);
+        }
         $password = $this->silentPrompt();
         $sk = SecretKey::fromFile($this->secretKeyFile, $password);
         foreach ($this->files as $file) {
             $message = MessageFile::fromFile($file);
             $sig = $message->sign($sk, $this->preHash, $this->trustedComment, $this->untrustedComment);
-            if (!empty($this->sigFile)) {
-                \file_put_contents(
-                    $this->sigFile,
-                    $sig->toSigFile()->getContents()
-                );
-            } else {
-                \file_put_contents(
-                    $file . '.minisig',
-                    $sig->toSigFile()->getContents()
-                );
+            if (!$this->saveSignFile($sig, $file)) {
+                throw new MinisignException('Could not write signature for file ' . $file);
             }
         }
+    }
+
+    /**
+     * Save the signature file.
+     *
+     * @param Signature $sig
+     * @param string $file
+     * @return bool
+     * @throws MinisignException
+     */
+    protected function saveSignFile(Signature $sig, string $file): bool
+    {
+        if (!empty($this->sigFile)) {
+            $result = \file_put_contents(
+                $this->sigFile,
+                $sig->toSigFile()->getContents()
+            );
+        } else {
+            $result = \file_put_contents(
+                $file . '.minisig',
+                $sig->toSigFile()->getContents()
+            );
+        }
+        return \is_int($result);
     }
 }

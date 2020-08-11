@@ -57,6 +57,18 @@ class Signature
     }
 
     /**
+     * Deserialize this signature from the provided SigFile object.
+     *
+     * @param SigFile $file
+     * @return Signature
+     * @throws MinisignException
+     */
+    public static function deserialize(SigFile $file): Signature
+    {
+        return $file->deserialize();
+    }
+
+    /**
      * @return string
      */
     public function getAlgorithm(): string
@@ -70,14 +82,6 @@ class Signature
     public function getKeyId(): string
     {
         return $this->keyId;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPreHashed(): bool
-    {
-        return \hash_equals($this->alg, Minisign::ALG_HASHEDDSA);
     }
 
     /**
@@ -113,21 +117,24 @@ class Signature
     }
 
     /**
+     * Is this algorithm set to one of the pre-hashed algorithms?
+     * (Currently, only Minisign::ALG_HASHEDDSA.)
+     *
+     * @return bool
+     */
+    public function isPreHashed(): bool
+    {
+        return \hash_equals($this->alg, Minisign::ALG_HASHEDDSA);
+    }
+
+    /**
+     * Serialize the current signature as a SigFile object.
+     *
      * @return SigFile
      * @throws MinisignException
      */
     public function toSigFile(): SigFile
     {
         return SigFile::serialize($this);
-    }
-
-    /**
-     * @param SigFile $file
-     * @return Signature
-     * @throws MinisignException
-     */
-    public static function deserialize(SigFile $file): Signature
-    {
-        return $file->deserialize();
     }
 }

@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Soatok\Minisign\Commands;
 
-use ParagonIE\ConstantTime\Base64;
 use Soatok\Minisign\CommandInterface;
 use Soatok\Minisign\Core\File\MessageFile;
 use Soatok\Minisign\Core\File\SigFile;
@@ -83,11 +82,11 @@ class Verify implements CommandInterface
     }
 
     /**
-     * @return string
+     * @return PublicKey
      */
-    public function getSignatureFile(): string
+    public function getPublicKey(): PublicKey
     {
-        return $this->sigFile;
+        return $this->publicKey;
     }
 
     /**
@@ -96,6 +95,14 @@ class Verify implements CommandInterface
     public function getQuietLevel(): int
     {
         return $this->quiet;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSignatureFile(): string
+    {
+        return $this->sigFile;
     }
 
     /**

@@ -38,12 +38,13 @@ $getOpt = (new GetOpt())
 
 $getOpt->process();
 $options = $getOpt->getOptions();
+$operands = $getOpt->getOperands();
 
 try {
     if (isset($options['G'])) {
         $command = new Generate($options);
     } elseif (isset($options['S'])) {
-        $command = new Sign($options);
+        $command = new Sign($options, $operands);
     } elseif (isset($options['V'])) {
         $command = new Verify($options);
     } elseif (isset($options['v'])) {

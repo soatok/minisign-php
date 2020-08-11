@@ -39,17 +39,25 @@ class Sign implements CommandInterface
     /**
      * Sign constructor.
      * @param array $options
+     * @param array $operands
      * @throws MinisignException
      */
-    public function __construct(array $options)
+    public function __construct(array $options, array $operands = [])
     {
         if (empty($options['m'])) {
             throw new MinisignException('Error: file not specified');
         }
         /** @var array<array-key, string> $selectedFiles */
         $selectedFiles = $options['m'];
+        /** @var string $file */
         foreach ($selectedFiles as $file) {
-            $this->files []= \realpath((string) $file);
+            $this->expandFilePath($file);
+        }
+        if (!empty($operands)) {
+            /** @var string $operand */
+            foreach ($operands as $operand) {
+                $this->expandFilePath($operand);
+            }
         }
 
         if (!empty($options['x']) && count($this->files) === 1) {
@@ -81,7 +89,7 @@ class Sign implements CommandInterface
      */
     public function __invoke()
     {
-        if (\file_exists($this->secretKeyFile)) {
+        if (!\file_exists($this->secretKeyFile)) {
             throw new MinisignException('Secret key file not found: ' . $this->secretKeyFile);
         }
         $password = $this->silentPrompt();
@@ -92,6 +100,16 @@ class Sign implements CommandInterface
             if (!$this->saveSignFile($sig, $file)) {
                 throw new MinisignException('Could not write signature for file ' . $file);
             }
+        }
+    }
+
+    /**
+     * @param string $input
+     */
+    protected function expandFilePath(string $input): void
+    {
+        foreach (\glob($input) as $file) {
+            $this->files []= \realpath($file);
         }
     }
 

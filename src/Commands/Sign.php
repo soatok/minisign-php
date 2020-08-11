@@ -59,6 +59,7 @@ class Sign implements CommandInterface
                 $this->expandFilePath($operand);
             }
         }
+        $this->files = \array_unique($this->files);
 
         if (!empty($options['x']) && count($this->files) === 1) {
             $this->sigFile = (string) $options['x'];
@@ -104,14 +105,18 @@ class Sign implements CommandInterface
     }
 
     /**
+     * Expand an -m flag or operand into a realpath or series of realpaths,
+     * and append all of the valid file paths to $this->files
+     *
      * @param string $input
+     * @return void
      */
     protected function expandFilePath(string $input): void
     {
         foreach (\glob($input) as $file) {
             $realpath = \realpath($file);
             if (!\is_dir($realpath)) {
-                $this->files [] = $realpath;
+                $this->files []= $realpath;
             }
         }
     }

@@ -42,7 +42,15 @@ class Generate implements CommandInterface
         }
 
         $secretKey = SecretKey::generate();
-        $password = $this->silentPrompt();
+        do {
+            $password = $this->silentPrompt();
+            $password2 = $this->silentPrompt('Please re-enter password:');
+            $matched = \hash_equals($password, $password2);
+            if (!$matched) {
+                echo 'Passwords do not match! Please try again.', PHP_EOL;
+            }
+        } while (!$matched);
+
         \file_put_contents($path, $secretKey->serialize($password));
         \sodium_memzero($password);
     }

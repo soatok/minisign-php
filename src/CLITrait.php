@@ -24,7 +24,6 @@ trait CLITrait
         return Binary::safeSubstr(\fgets($fp), 0, -1);
     }
 
-
     /**
      * Interactively prompts for input without echoing to the terminal.
      * Requires a bash shell or Windows and won't work with
@@ -36,29 +35,55 @@ trait CLITrait
      * @return string
      *
      * @psalm-suppress ForbiddenCode { THIS IS FINE }
+     * @throws MinisignException
      */
     public function silentPrompt(string $text = 'Enter Password:'): string
     {
         if (DIRECTORY_SEPARATOR === '\\') {
-            $vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
-            \file_put_contents(
-                $vbscript,
-                'wscript.echo(InputBox("' . \addslashes($text) . '", "", "password here"))'
-            );
-            $command = "cscript //nologo " . \escapeshellarg($vbscript);
-            $password = \rtrim(
-                (string) \shell_exec($command)
-            );
-            \unlink($vbscript);
+            $password = $this->silentPromptWindows($text);
+        } elseif (defined('STDIN')) {
+            echo $text, ' ';
+            $password = $this->silentPromptStdin();
+            echo PHP_EOL;
         } else {
-            $command = "/usr/bin/env bash -c 'echo OK'";
-            if (\rtrim((string) \shell_exec($command)) !== 'OK') {
-                throw new MinisignException("Can't invoke bash");
-            }
-            $command = "/usr/bin/env bash -c 'read -s -p \"" . \addslashes($text) . "\" mypassword && echo \$mypassword'";
-            $password = \rtrim((string) \shell_exec($command));
-            echo "\n";
+            throw new MinisignException('STDIN not defined');
         }
         return $password;
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     * @psalm-suppress ForbiddenCode { THIS IS FINE }
+     */
+    protected function silentPromptWindows(string $text): string
+    {
+        $vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
+        \file_put_contents(
+            $vbscript,
+            'wscript.echo(InputBox("' . \addslashes($text) . '", "", "password here"))'
+        );
+        $command = "cscript //nologo " . \escapeshellarg($vbscript);
+        $password = \rtrim(
+            (string) \shell_exec($command)
+        );
+        \unlink($vbscript);
+        return $password;
+    }
+
+    /**
+     * @return string
+     * @throws MinisignException
+     * @psalm-suppress ForbiddenCode { THIS IS FINE }
+     */
+    protected function silentPromptStdin(): string
+    {
+        if (!defined('STDIN')) {
+            throw new MinisignException('STDIN is not available');
+        }
+        \exec('stty -echo');
+        $result = \fgets(STDIN);
+        \exec('stty echo');
+        return $result;
     }
 }

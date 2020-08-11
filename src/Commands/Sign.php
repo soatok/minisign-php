@@ -73,11 +73,6 @@ class Sign implements CommandInterface
         } else {
             $this->secretKeyFile = Minisign::getHomeDir() . '/.minisign/minisign.key';
         }
-        $realpath = \realpath($this->secretKeyFile);
-        if (!\is_string($realpath)) {
-            throw new MinisignFileException('Secret key file not found: '. $this->secretKeyFile);
-        }
-        $this->secretKeyFile = $realpath;
 
         $this->preHash = !empty($options['H']);
 
@@ -128,6 +123,11 @@ class Sign implements CommandInterface
      */
     public function __invoke()
     {
+        $realpath = \realpath($this->secretKeyFile);
+        if (!\is_string($realpath)) {
+            throw new MinisignFileException('Secret key file not found: '. $this->secretKeyFile);
+        }
+        $this->secretKeyFile = $realpath;
         if (!\file_exists($this->secretKeyFile)) {
             throw new MinisignException('Secret key file not found: ' . $this->secretKeyFile);
         }

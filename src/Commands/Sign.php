@@ -109,7 +109,10 @@ class Sign implements CommandInterface
     protected function expandFilePath(string $input): void
     {
         foreach (\glob($input) as $file) {
-            $this->files []= \realpath($file);
+            $realpath = \realpath($file);
+            if (!\is_dir($realpath)) {
+                $this->files [] = $realpath;
+            }
         }
     }
 

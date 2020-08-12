@@ -2,12 +2,16 @@
 declare(strict_types=1);
 namespace Soatok\Minisign\Commands;
 
-use ParagonIE\ConstantTime\Base64;
 use Soatok\Minisign\CommandInterface;
-use Soatok\Minisign\Core\File\MessageFile;
-use Soatok\Minisign\Core\File\SigFile;
+use Soatok\Minisign\Core\File\{
+    MessageFile,
+    SigFile
+};
 use Soatok\Minisign\Core\PublicKey;
-use Soatok\Minisign\Exceptions\MinisignException;
+use Soatok\Minisign\Exceptions\{
+    MinisignException,
+    MinisignFileException
+};
 
 /**
  * Class Verify
@@ -50,7 +54,13 @@ class Verify implements CommandInterface
         }
         /** @var array<array-key, string> $files */
         $files = $options['m'];
-        $this->file = \realpath((string) $files[0]);
+        $file = (string) $files[0];
+        $realpath = \realpath($file);
+        if (empty($realpath)) {
+            throw new MinisignFileException('File not found: ' . $file);
+        }
+        $this->file = $realpath;
+
         if (!empty($options['x'])) {
             $this->sigFile = (string) $options['x'];
         } else {
@@ -68,7 +78,40 @@ class Verify implements CommandInterface
     }
 
     /**
+     * @return string
+     */
+    public function getFile(): string
+    {
+        return $this->file;
+    }
+
+    /**
+     * @return PublicKey
+     */
+    public function getPublicKey(): PublicKey
+    {
+        return $this->publicKey;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQuietLevel(): int
+    {
+        return $this->quiet;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSignatureFile(): string
+    {
+        return $this->sigFile;
+    }
+
+    /**
      * @return void
+     * @throws MinisignException
      */
     public function __invoke()
     {

@@ -8,7 +8,7 @@ namespace Soatok\Minisign;
  */
 class Minisign
 {
-    const VERSION = 'v0.1';
+    const VERSION = 'v0.4';
     const ALG_EDDSA = 'Ed';
     const ALG_HASHEDDSA = 'ED';
     const ALG_SCRYPT = 'Sc';

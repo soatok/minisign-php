@@ -2,13 +2,20 @@
 declare(strict_types=1);
 namespace Soatok\Minisign\Commands;
 
-use Soatok\Minisign\CLITrait;
-use Soatok\Minisign\CommandInterface;
-use Soatok\Minisign\Core\File\MessageFile;
-use Soatok\Minisign\Core\SecretKey;
-use Soatok\Minisign\Core\Signature;
-use Soatok\Minisign\Exceptions\MinisignException;
-use Soatok\Minisign\Minisign;
+use Soatok\Minisign\Core\{
+    File\MessageFile,
+    SecretKey,
+    Signature
+};
+use Soatok\Minisign\Exceptions\{
+    MinisignException,
+    MinisignFileException
+};
+use Soatok\Minisign\{
+    Minisign,
+    CLITrait,
+    CommandInterface
+};
 
 /**
  * Class Sign
@@ -84,20 +91,65 @@ class Sign implements CommandInterface
     }
 
     /**
+     * @return array<array-key, string>
+     */
+    public function getFiles(): array
+    {
+        return $this->files;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPreHash(): bool
+    {
+        return $this->preHash;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTrustedComment(): string
+    {
+        return $this->trustedComment;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUntrustedComment(): string
+    {
+        return $this->untrustedComment;
+    }
+
+    /**
      * @return void
      * @throws MinisignException
      * @throws \SodiumException
      */
     public function __invoke()
     {
+        $realpath = \realpath($this->secretKeyFile);
+        if (!\is_string($realpath)) {
+            throw new MinisignFileException('Secret key file not found: '. $this->secretKeyFile);
+        }
+        $this->secretKeyFile = $realpath;
         if (!\file_exists($this->secretKeyFile)) {
             throw new MinisignException('Secret key file not found: ' . $this->secretKeyFile);
         }
         $password = $this->silentPrompt();
         $sk = SecretKey::fromFile($this->secretKeyFile, $password);
         foreach ($this->files as $file) {
+            if (empty($this->trustedComment)) {
+                /** @var string[] $pieces */
+                $pieces = \explode(DIRECTORY_SEPARATOR, \trim($file, DIRECTORY_SEPARATOR));
+                $baseFilename = \array_pop($pieces);
+                $trustedComment = "timestamp:" . \time() . "\tfile:" . $baseFilename;
+            } else {
+                $trustedComment = $this->trustedComment;
+            }
             $message = MessageFile::fromFile($file);
-            $sig = $message->sign($sk, $this->preHash, $this->trustedComment, $this->untrustedComment);
+            $sig = $message->sign($sk, $this->preHash, $trustedComment, $this->untrustedComment);
             if (!$this->saveSignFile($sig, $file)) {
                 throw new MinisignException('Could not write signature for file ' . $file);
             }

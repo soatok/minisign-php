@@ -3,11 +3,13 @@ declare(strict_types=1);
 namespace Soatok\Minisign\Commands;
 
 use ParagonIE\ConstantTime\Base64;
-use Soatok\Minisign\CLITrait;
-use Soatok\Minisign\CommandInterface;
 use Soatok\Minisign\Core\SecretKey;
 use Soatok\Minisign\Exceptions\MinisignException;
-use Soatok\Minisign\Minisign;
+use Soatok\Minisign\{
+    Minisign,
+    CLITrait,
+    CommandInterface
+};
 
 /**
  * Class Generate

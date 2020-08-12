@@ -49,6 +49,7 @@ try {
         $command = new Verify($options);
     } elseif (isset($options['v'])) {
         echo Minisign::VERSION, PHP_EOL;
+        exit(0);
     } else {
         echo file_get_contents(__DIR__ . '/usage.txt');
         exit(0);

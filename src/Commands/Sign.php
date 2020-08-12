@@ -2,14 +2,20 @@
 declare(strict_types=1);
 namespace Soatok\Minisign\Commands;
 
-use Soatok\Minisign\CLITrait;
-use Soatok\Minisign\CommandInterface;
-use Soatok\Minisign\Core\File\MessageFile;
-use Soatok\Minisign\Core\SecretKey;
-use Soatok\Minisign\Core\Signature;
-use Soatok\Minisign\Exceptions\MinisignException;
-use Soatok\Minisign\Exceptions\MinisignFileException;
-use Soatok\Minisign\Minisign;
+use Soatok\Minisign\Core\{
+    File\MessageFile,
+    SecretKey,
+    Signature
+};
+use Soatok\Minisign\Exceptions\{
+    MinisignException,
+    MinisignFileException
+};
+use Soatok\Minisign\{
+    Minisign,
+    CLITrait,
+    CommandInterface
+};
 
 /**
  * Class Sign

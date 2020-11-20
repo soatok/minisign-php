@@ -1,6 +1,7 @@
 # Minisign (PHP)
 
-[![Support on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fsoatok&style=flat)](https://patreon.com/soatok)
+[![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dsoatok%26type%3Dpatrons&style=for-the-badge)](https://patreon.com/soatok)
+
 [![Linux Build Status](https://travis-ci.org/soatok/minisign-php.svg?branch=master)](https://travis-ci.org/soatok/minisign-php)
 [![Latest Stable Version](https://poser.pugx.org/soatok/minisign/v/stable)](https://packagist.org/packages/soatok/minisign)
 [![Latest Unstable Version](https://poser.pugx.org/soatok/minisign/v/unstable)](https://packagist.org/packages/soatok/minisign)

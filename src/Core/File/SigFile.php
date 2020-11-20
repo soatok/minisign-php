@@ -6,8 +6,10 @@ use Soatok\Minisign\Core\{
     FileStream,
     Signature
 };
-use ParagonIE\ConstantTime\Base64;
-use ParagonIE\ConstantTime\Binary;
+use ParagonIE\ConstantTime\{
+    Base64,
+    Binary
+};
 use Soatok\Minisign\Exceptions\MinisignFileException;
 use Soatok\Minisign\Minisign;
 

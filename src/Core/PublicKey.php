@@ -121,6 +121,6 @@ class PublicKey
             $this->keyId = \str_repeat("\0", 8);
         }
         return Minisign::COMMENT_PREFIX . $this->untrustedComment . "\r\n" .
-            Base64::encodeUnpadded($this->keyId . $this->pk);
+            Base64::encodeUnpadded('Ed' . $this->keyId . $this->pk);
     }
 }

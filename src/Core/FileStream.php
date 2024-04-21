@@ -67,7 +67,7 @@ class FileStream
      * @throws MinisignFileException
      * @throws \TypeError
      */
-    public static function fromStream($resource): static
+    public static function fromStream($resource): self
     {
         if (!\is_resource($resource)) {
             throw new \TypeError('Argument 1 must be a resource, ' . \gettype($resource) . ' given.');

@@ -62,8 +62,12 @@ class PublicKey
             throw new MinisignException('Invalid public key format');
         }
         $decoded = Base64::decode($m[2]);
-        $keyId = Binary::safeSubstr($decoded, 0, 8);
-        $pk = Binary::safeSubstr($decoded, 8, 32);
+        $alg = Binary::safeSubstr($decoded, 0, 2);
+        if (!hash_equals($alg, 'Ed')) {
+            throw new MinisignException('Invalid algorithm');
+        }
+        $keyId = Binary::safeSubstr($decoded, 2, 8);
+        $pk = Binary::safeSubstr($decoded, 10, 32);
         return new self($pk, $keyId, $m[1]);
     }
 

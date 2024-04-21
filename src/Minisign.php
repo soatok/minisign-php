@@ -21,14 +21,16 @@ class Minisign
      * Get the homedir of the current active user.
      *
      * @return string
+     *
+     * @psalm-suppress PossiblyUndefinedArrayOffset
      */
     public static function getHomeDir(): string
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             // Windows-specific:
-            return (string) $_SERVER['HOMEDRIVE'] . (string) $_SERVER['HOMEPATH'];
+            return $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'];
         }
         // Linux and Mac:
-        return (string) $_SERVER['HOME'];
+        return $_SERVER['HOME'];
     }
 }

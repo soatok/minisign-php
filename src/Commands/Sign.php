@@ -56,7 +56,6 @@ class Sign implements CommandInterface
         }
         /** @var array<array-key, string> $selectedFiles */
         $selectedFiles = $options['m'];
-        /** @var string $file */
         foreach ($selectedFiles as $file) {
             $this->expandFilePath($file);
         }

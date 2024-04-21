@@ -64,7 +64,7 @@ class PublicKey
         $decoded = Base64::decode($m[2]);
         $keyId = Binary::safeSubstr($decoded, 0, 8);
         $pk = Binary::safeSubstr($decoded, 8, 32);
-        return new static($pk, $keyId, $m[1]);
+        return new self($pk, $keyId, $m[1]);
     }
 
 
@@ -88,12 +88,12 @@ class PublicKey
     /**
      * @param string $encoded
      * @param string $keyId
-     * @return static
+     * @return self
      * @throws MinisignException
      */
     public static function fromBase64String(string $encoded, string $keyId = ''): self
     {
-        return new static(Base64::decode($encoded), $keyId);
+        return new PublicKey(Base64::decode($encoded), $keyId);
     }
 
     /**

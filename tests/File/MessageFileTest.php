@@ -39,6 +39,9 @@ class MessageFileTest extends TestCase
         \fwrite($fp, $this->random);
         \fseek($fp, 0);
         $messageFile = MessageFile::fromStream($fp);
+        if (!($messageFile instanceof MessageFile)) {
+            $this->fail('Message File is not the right type');
+        }
         $sk = SecretKey::generate();
         $pk = $sk->getPublicKey();
 

@@ -53,7 +53,7 @@ class SecretKey
      *
      * @param string $contents
      * @param string $password
-     * @return static
+     * @return self
      * @throws MinisignException
      * @throws \SodiumException
      */
@@ -74,7 +74,7 @@ class SecretKey
         $kdfMemLimit = (int) \unpack('V', $packedMemLimit)[1];
         $kdfOutput = self::kdf($kdfAlg, $password, $kdfSalt, $kdfOpsLimit, $kdfMemLimit);
         \sodium_memzero($password);
-        $remainder = (string) (Binary::safeSubstr($decoded, 54, 104) ^ $kdfOutput);
+        $remainder = Binary::safeSubstr($decoded, 54, 104) ^ $kdfOutput;
         $keyId = Binary::safeSubstr($remainder, 0, 8);
         $ed25519sk = Binary::safeSubstr($remainder, 8, 32);
         $ed25519pk = Binary::safeSubstr($remainder, 40, 32);
@@ -88,7 +88,7 @@ class SecretKey
             throw new MinisignCryptoException('Checksum failed');
         }
 
-        $self = new static();
+        $self = new SecretKey();
         $self->signatureAlgorithm = $sigAlg;
         $self->kdfAlgorithm = $kdfAlg;
         $self->checksumAlgorithm = $cksAlg;
@@ -106,7 +106,7 @@ class SecretKey
      *
      * @param string $filePath
      * @param string $password
-     * @return static
+     * @return self
      * @throws MinisignException
      * @throws \SodiumException
      */
@@ -128,7 +128,7 @@ class SecretKey
     /**
      * Generate a new Minsign secret key.
      *
-     * @return static
+     * @return self
      * @throws \SodiumException
      */
     public static function generate(): self
@@ -138,7 +138,7 @@ class SecretKey
         $ed25519pk = \sodium_crypto_sign_publickey($keypair);
         $keyId = \random_bytes(8);
 
-        $self = new static();
+        $self = new self();
         $self->ed25519sk = $ed25519sk;
         $self->ed25519pk = $ed25519pk;
         $self->keyId = $keyId;
@@ -225,7 +225,7 @@ class SecretKey
             $this->signatureAlgorithm . $this->keyId . $this->ed25519sk
         );
         $toXor = $this->keyId . $this->ed25519sk . $checksum;
-        $toEncode .= (string) ($kdfOutput ^ $toXor);
+        $toEncode .= $kdfOutput ^ $toXor;
         return $output . Base64::encode($toEncode) . "\r\n";
     }
 

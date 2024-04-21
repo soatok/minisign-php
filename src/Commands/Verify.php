@@ -54,7 +54,7 @@ class Verify implements CommandInterface
         }
         /** @var array<array-key, string> $files */
         $files = $options['m'];
-        $file = (string) $files[0];
+        $file = $files[0];
         $realpath = \realpath($file);
         if (empty($realpath)) {
             throw new MinisignFileException('File not found: ' . $file);

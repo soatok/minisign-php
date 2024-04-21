@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Soatok\Minisign\Core;
 
+use phpDocumentor\Reflection\Types\Static_;
 use Soatok\Minisign\Exceptions\MinisignFileException;
 
 /**
@@ -66,7 +67,7 @@ class FileStream
      * @throws MinisignFileException
      * @throws \TypeError
      */
-    public static function fromStream($resource): self
+    public static function fromStream($resource): static
     {
         if (!\is_resource($resource)) {
             throw new \TypeError('Argument 1 must be a resource, ' . \gettype($resource) . ' given.');
@@ -133,6 +134,8 @@ class FileStream
     /**
      * @param int $chunkSize
      * @return self
+     *
+     * @psalm-suppress UnusedFunctionCall
      */
     public function setChunkSize(int $chunkSize = 8192): self
     {

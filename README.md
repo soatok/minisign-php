@@ -1,6 +1,7 @@
 # Minisign (PHP)
 
-[![Linux Build Status](https://travis-ci.org/soatok/minisign-php.svg?branch=master)](https://travis-ci.org/soatok/minisign-php)
+[![Build Status](https://github.com/soatok/minisign-php/actions/workflows/ci.yml/badge.svg)](https://github.com/soatok/minisign-php/actions)
+[![Static Analysis](https://github.com/soatok/minisign-php/actions/workflows/psalm.yml/badge.svg)](https://github.com/soatok/minisign-php/actions)
 [![Latest Stable Version](https://poser.pugx.org/soatok/minisign/v/stable)](https://packagist.org/packages/soatok/minisign)
 [![Latest Unstable Version](https://poser.pugx.org/soatok/minisign/v/unstable)](https://packagist.org/packages/soatok/minisign)
 [![License](https://poser.pugx.org/soatok/minisign/license)](https://packagist.org/packages/soatok/minisign)
